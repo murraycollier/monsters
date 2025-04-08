@@ -8,6 +8,6 @@ theme = 'hello-friend-ng'
     dir = ':cacheDir/images'
 
 [[menu.main]]
-  identifier = "blog"
-  name       = "Blog"
-  url        = "posts/"
+  identifier = "monster"
+  name       = "Ratings"
+  url        = "posts/monsters"
