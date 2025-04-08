@@ -1,0 +1,8 @@
+baseURL = 'https://murraycollier.github.io/monsters'
+languageCode = 'en-us'
+title = 'My New Hugo Site'
+theme = 'hello-friend-ng'
+
+[caches]
+  [caches.images]
+    dir = ':cacheDir/images'
