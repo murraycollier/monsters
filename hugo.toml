@@ -10,4 +10,4 @@ theme = 'hello-friend-ng'
 [[menu.main]]
   identifier = "blog"
   name       = "Blog"
-  url        = "posts/"
+  url        = "content/posts/"
