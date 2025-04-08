@@ -6,8 +6,3 @@ theme = 'hello-friend-ng'
 [caches]
   [caches.images]
     dir = ':cacheDir/images'
-
-[[menu.main]]
-  identifier = "blog"
-  name       = "Blog"
-  url        = "posts/"
