@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Untagged on My New Hugo Site</title>
+    <title>Untagged on </title>
     <link>http://localhost:1313/tags/untagged/</link>
-    <description>Recent content in Untagged on My New Hugo Site</description>
+    <description>Recent content in Untagged on </description>
     <generator>Hugo</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 08 Apr 2025 15:36:04 +0100</lastBuildDate>
     <atom:link href="http://localhost:1313/tags/untagged/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>My First Post</title>
-      <link>http://localhost:1313/posts/my-first-post/</link>
+      <title>Monsters</title>
+      <link>http://localhost:1313/posts/monsters/</link>
       <pubDate>Tue, 08 Apr 2025 15:36:04 +0100</pubDate>
-      <guid>http://localhost:1313/posts/my-first-post/</guid>
-      <description></description>
+      <guid>http://localhost:1313/posts/monsters/</guid>
+      <description>&lt;table&gt;&#xA;  &lt;thead&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;th style=&#34;text-align: left&#34;&gt;Syntax&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: center&#34;&gt;Description&lt;/th&gt;&#xA;          &lt;th style=&#34;text-align: right&#34;&gt;Test Text&lt;/th&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/thead&gt;&#xA;  &lt;tbody&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Header&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;Title&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: right&#34;&gt;Here&amp;rsquo;s this&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;      &lt;tr&gt;&#xA;          &lt;td style=&#34;text-align: left&#34;&gt;Paragraph&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: center&#34;&gt;Text&lt;/td&gt;&#xA;          &lt;td style=&#34;text-align: right&#34;&gt;And more&lt;/td&gt;&#xA;      &lt;/tr&gt;&#xA;  &lt;/tbody&gt;&#xA;&lt;/table&gt;</description>
     </item>
   </channel>
 </rss>

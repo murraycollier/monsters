@@ -1,13 +1,11 @@
-baseURL = 'https://monsterhunters.club'
+baseURL = "https://monsterhunters.club"
 languageCode = 'en-us'
-title = 'My New Hugo Site'
-theme = 'hello-friend-ng'
+theme = "coming-soon"
 
-[caches]
-  [caches.images]
-    dir = ':cacheDir/images'
-
-[[menu.main]]
-  identifier = "monster"
-  name       = "Ratings"
-  url        = "posts/monsters"
+[params]
+    title = "monsterhunters"
+    description = ""
+    favicon = ""
+    message = "COMING SOON!"
+    release = "May 1, 2025"
+    background = ""
