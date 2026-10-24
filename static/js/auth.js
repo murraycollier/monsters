@@ -9,6 +9,17 @@ import { doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.0/f
 
 const googleProvider = new GoogleAuthProvider();
 
+// Listen to auth state changes when auth.js loads
+const checkAuth = setInterval(() => {
+  if (window.auth) {
+    clearInterval(checkAuth);
+    onAuthStateChanged(window.auth, (user) => {
+      window.currentUser = user;
+      updateAuthUI();
+    });
+  }
+}, 100);
+
 function openAuthModal() {
   document.getElementById("auth-modal").classList.remove("hidden");
 }

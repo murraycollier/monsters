@@ -18,10 +18,4 @@
   window.auth = getAuth(app);
   window.db = getFirestore(app);
   window.storage = getStorage(app);
-
-  // Listen to auth state changes globally
-  onAuthStateChanged(window.auth, (user) => {
-    window.currentUser = user;
-    updateAuthUI();
-  });
 </script>
