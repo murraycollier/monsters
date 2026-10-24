@@ -18,4 +18,9 @@
   window.auth = getAuth(app);
   window.db = getFirestore(app);
   window.storage = getStorage(app);
+
+  // Initialize auth listener if available
+  if (typeof window.setupAuthListener === 'function') {
+    window.setupAuthListener();
+  }
 </script>
