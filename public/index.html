@@ -196,6 +196,7 @@
   window.auth = getAuth(app);
   window.db = getFirestore(app);
   window.storage = getStorage(app);
+  window.currentUser = null;
 
   
   if (typeof window.setupAuthListener === 'function') {
