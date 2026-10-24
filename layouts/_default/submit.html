@@ -215,12 +215,15 @@
   }
 
   // Check auth and load drinks
+  let authCheckAttempts = 0;
   const checkAuth = setInterval(() => {
-    if (window.currentUser === undefined) return;
+    authCheckAttempts++;
+    if (window.currentUser === undefined && authCheckAttempts < 50) return;
 
     clearInterval(checkAuth);
 
-    if (!window.currentUser) {
+    const user = window.currentUser || null;
+    if (!user) {
       document.getElementById("auth-check").innerHTML = `
         <p class="text-muted">Please sign in to submit a review</p>
         <button class="btn btn-primary" onclick="openAuthModal()">Sign In</button>
