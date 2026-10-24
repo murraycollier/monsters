@@ -1,0 +1,10 @@
+{{ define "main" }}
+<script>
+  const checkDB = setInterval(() => {
+    if (window.renderProfile) {
+      clearInterval(checkDB);
+      window.renderProfile();
+    }
+  }, 100);
+</script>
+{{ end }}

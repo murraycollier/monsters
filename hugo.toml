@@ -1,11 +1,6 @@
 baseURL = "https://monsterhunters.club"
-languageCode = 'en-us'
-theme = "coming-soon"
+languageCode = "en-us"
 
 [params]
-    title = "monsterhunters"
-    description = ""
-    favicon = ""
-    message = "COMING SOON!"
-    release = "Feb 1, 2026"
-    background = ""
+  title = "Monster Hunters"
+  description = "Rate the beast. Review every Monster Energy drink."

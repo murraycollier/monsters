@@ -1,45 +1,208 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-us">
 <head>
-	<meta name="generator" content="Hugo 0.145.0"><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>monsterhunters</title>
-    <link rel="canonical" href="http://localhost:1313/">
-    
-        <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    
-    <link rel="stylesheet" href="/css/styles.css">
-    <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-</head>
-    <div class="bgimg">
-        <video autoplay muted loop poster="poster.jpg">
-            
-                <source src="bg.mp4" type="video/mp4">
-            
-        </video>
-        
-        <div class="topleft">
-            
-                <p>monsterhunters</p>
-            
-        </div>
-        <div class="middle">
-            
-                <h1>COMING SOON!</h1>
-            
-            <hr>
-            <p id="demo"></p>
-            <div id="countdown" data-release="May 1, 2025"></div>
-        </div>
-        <div class="bottomleft">
-            <p>
-            </p>
-        </div>
-    </div>
-    <div class="left">
-        
-    </div>
-        <script src="/js/script.js"></script>
+	<meta name="generator" content="Hugo 0.157.0">
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home | Monster Hunters</title>
+<meta name="description" content="Rate the beast. Review every Monster Energy drink.">
 
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/monster.css">
+
+</head>
+<body>
+  <header class="header">
+  <div class="container">
+    <div class="nav">
+      <div class="nav-brand">
+        <a href="/" class="logo">
+          <img src="/images/hd-monster-logo.png" alt="Monster Hunters">
+        </a>
+        <h1>Monster Hunters</h1>
+      </div>
+      <nav class="nav-links">
+        <a href="/">Home</a>
+        <a href="/leaderboard/">Leaderboard</a>
+        <a href="/submit/" class="nav-link-auth">Submit Review</a>
+        <button id="nav-auth-btn" class="btn btn-nav" onclick="openAuthModal()">Sign In</button>
+        <button id="nav-profile-btn" class="btn btn-nav hidden" onclick="goToProfile()">Profile</button>
+        <button id="nav-logout-btn" class="btn btn-nav hidden" onclick="logout()">Sign Out</button>
+      </nav>
+    </div>
+  </div>
+</header>
+
+
+  <main class="main-content">
+    
+<div class="hero">
+  <h2>RATE THE BEAST</h2>
+  <p>Review every Monster Energy drink. See what others think.</p>
+  <button class="btn btn-primary" onclick="window.currentUser ? window.location.href='/submit/' : openAuthModal()">
+    Start Rating
+  </button>
+</div>
+
+<div class="container p-4">
+  <h3 style="color: var(--green); margin: 2rem 0 1rem;">🏆 Top Drinks</h3>
+  <div id="top-drinks" class="grid grid-3" style="min-height: 200px;">
+    <p class="text-muted">Loading...</p>
+  </div>
+
+  <h3 style="color: var(--green); margin: 3rem 0 1rem;">💬 Recent Reviews</h3>
+  <div id="recent-reviews" style="display: grid; gap: 1.5rem; min-height: 200px;">
+    <p class="text-muted">Loading...</p>
+  </div>
+
+  <div style="text-align: center; margin: 3rem 0;">
+    <a href="/leaderboard/" class="btn btn-secondary">View Full Leaderboard</a>
+  </div>
+</div>
+
+<script type="module">
+  import { query, collection, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  async function renderHome() {
+    
+    try {
+      const q = query(
+        collection(window.db, "drinks"),
+        where("approved", "==", true),
+        where("review_count", ">", 0),
+        orderBy("avg_overall", "desc"),
+        limit(3)
+      );
+      const snapshot = await getDocs(q);
+      const drinks = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      document.getElementById("top-drinks").innerHTML = drinks.length > 0
+        ? drinks.map(drink => `
+            <div class="card" onclick="window.location.href='/drink/?id=${drink.id}'">
+              <div class="card-title">${drink.name}</div>
+              <div style="color: var(--green); font-weight: bold; margin: 0.5rem 0;">
+                ${(drink.avg_overall || 0).toFixed(1)} / 5
+              </div>
+              <small class="text-muted">${drink.review_count || 0} reviews</small>
+            </div>
+          `).join("")
+        : `<p class="text-muted">No drinks rated yet.</p>`;
+    } catch (error) {
+      console.error("Error loading top drinks:", error);
+      document.getElementById("top-drinks").innerHTML = `<p class="text-muted">Error loading drinks.</p>`;
+    }
+
+    
+    try {
+      const q = query(
+        collection(window.db, "reviews"),
+        orderBy("created_at", "desc"),
+        limit(6)
+      );
+      const snapshot = await getDocs(q);
+      const reviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      document.getElementById("recent-reviews").innerHTML = reviews.length > 0
+        ? reviews.map(review => `
+            <div class="card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <strong>${review.user_display_name}</strong>
+                <span style="color: var(--green); font-weight: bold;">${review.overall}/5</span>
+              </div>
+              <a href="/drink/?id=${review.drink_id}" style="color: var(--green); text-decoration: none; font-weight: 600;">
+                → ${review.drink_name}
+              </a>
+              ${review.notes ? `<p class="text-muted" style="margin-top: 0.5rem;">${review.notes.substring(0, 100)}${review.notes.length > 100 ? '...' : ''}</p>` : ""}
+            </div>
+          `).join("")
+        : `<p class="text-muted">No reviews yet.</p>`;
+    } catch (error) {
+      console.error("Error loading reviews:", error);
+      document.getElementById("recent-reviews").innerHTML = `<p class="text-muted">Error loading reviews.</p>`;
+    }
+  }
+
+  
+  const checkDB = setInterval(() => {
+    if (window.db) {
+      clearInterval(checkDB);
+      renderHome();
+    }
+  }, 100);
+</script>
+
+  </main>
+
+  <footer class="footer">
+  <div class="container">
+    <p>&copy; 2025 Monster Hunters. Rate the Beast.</p>
+  </div>
+</footer>
+
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  import { getStorage } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-storage.js";
+
+  
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_STORAGE_BUCKET",
+    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.auth = getAuth(app);
+  window.db = getFirestore(app);
+  window.storage = getStorage(app);
+
+  
+  onAuthStateChanged(window.auth, (user) => {
+    window.currentUser = user;
+    updateAuthUI();
+  });
+</script>
+
+
+  
+  <div id="auth-modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('signin')">Sign In</button>
+        <button class="tab-btn" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <div id="signin-form" class="tab-content">
+        <input type="email" id="signin-email" placeholder="Email" class="input-field">
+        <input type="password" id="signin-password" placeholder="Password" class="input-field">
+        <button onclick="signInEmail()" class="btn btn-primary">Sign In</button>
+        <div class="divider">OR</div>
+        <button onclick="signInGoogle()" class="btn btn-secondary">Continue with Google</button>
+      </div>
+
+      <div id="signup-form" class="tab-content hidden">
+        <input type="text" id="signup-name" placeholder="Display Name" class="input-field">
+        <input type="email" id="signup-email" placeholder="Email" class="input-field">
+        <input type="password" id="signup-password" placeholder="Password" class="input-field">
+        <button onclick="signUpEmail()" class="btn btn-primary">Sign Up</button>
+        <div class="divider">OR</div>
+        <button onclick="signInGoogle()" class="btn btn-secondary">Continue with Google</button>
+      </div>
+
+      <p id="auth-error" class="error-text"></p>
+    </div>
+  </div>
+
+  <script src="/js/auth.js"></script>
+  <script src="/js/reviews.js"></script>
+  <script src="/js/leaderboard.js"></script>
+  <script src="/js/drink.js"></script>
+  <script src="/js/profile.js"></script>
+  <script src="/js/upload.js"></script>
+</body>
 </html>

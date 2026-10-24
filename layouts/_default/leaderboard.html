@@ -1,0 +1,32 @@
+{{ define "main" }}
+<div class="container p-4">
+  <h2 style="color: var(--green); margin-bottom: 2rem;">🏆 Leaderboard</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Drink Name</th>
+        <th onclick="renderLeaderboard('avg_drinkability')">Drinkability</th>
+        <th onclick="renderLeaderboard('avg_time_to_empty')">Time to Empty</th>
+        <th onclick="renderLeaderboard('avg_energy_boost')">Energy Boost</th>
+        <th onclick="renderLeaderboard('avg_taste')">Taste</th>
+        <th onclick="renderLeaderboard('avg_value')">Value</th>
+        <th onclick="renderLeaderboard('avg_overall')">Overall</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td colspan="8" style="text-align: center;" class="text-muted">Loading...</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  const checkDB = setInterval(() => {
+    if (window.renderLeaderboard) {
+      clearInterval(checkDB);
+      window.renderLeaderboard();
+    }
+  }, 100);
+</script>
+{{ end }}

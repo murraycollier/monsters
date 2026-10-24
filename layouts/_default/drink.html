@@ -1,0 +1,10 @@
+{{ define "main" }}
+<script>
+  const checkDB = setInterval(() => {
+    if (window.renderDrinkDetail) {
+      clearInterval(checkDB);
+      window.renderDrinkDetail();
+    }
+  }, 100);
+</script>
+{{ end }}

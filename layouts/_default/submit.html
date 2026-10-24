@@ -1,0 +1,244 @@
+{{ define "main" }}
+<div class="container p-4">
+  <h2 style="color: var(--green); margin-bottom: 2rem;">Submit a Review</h2>
+
+  <div id="auth-check" class="text-center">
+    <p class="text-muted">Checking authentication...</p>
+  </div>
+
+  <div id="submit-form" class="card" style="max-width: 600px; display: none;">
+    <h3 style="color: var(--green); margin-bottom: 1rem;">Step 1: Select a Drink</h3>
+
+    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+      <div>
+        <label for="drink-search" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Search or Select Drink</label>
+        <input type="text" id="drink-search" placeholder="Search Monster drinks..." class="input-field">
+        <div id="drink-list" style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 4px; margin-top: 0.5rem;"></div>
+      </div>
+
+      <div>
+        <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Or Create New Variant</label>
+        <input type="text" id="new-drink-name" placeholder="e.g., Monster Ultra Citron" class="input-field">
+        <button class="btn btn-secondary" onclick="addNewDrink()" style="width: 100%;">Add New Drink</button>
+      </div>
+
+      <div id="selected-drink" style="padding: 1rem; background: var(--card); border-left: 4px solid var(--green); display: none;">
+        <strong id="selected-drink-name"></strong>
+      </div>
+    </div>
+
+    <h3 style="color: var(--green); margin-bottom: 1rem; margin-top: 2rem;">Step 2: Rate the Drink</h3>
+
+    <div style="display: grid; gap: 1.5rem; margin-bottom: 2rem;">
+      <div>
+        <label style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
+          <span>Drinkability</span>
+          <span id="drinkability-value">3</span>
+        </label>
+        <input type="range" id="drinkability" min="1" max="5" value="3" oninput="updateValue('drinkability')">
+        <small class="text-muted">How easy is it to drink?</small>
+      </div>
+
+      <div>
+        <label style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
+          <span>Time to Empty</span>
+          <span id="time_to_empty-value">3</span>
+        </label>
+        <input type="range" id="time_to_empty" min="1" max="5" value="3" oninput="updateValue('time_to_empty')">
+        <small class="text-muted">How quickly can you drink it?</small>
+      </div>
+
+      <div>
+        <label style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
+          <span>Energy Boost</span>
+          <span id="energy_boost-value">3</span>
+        </label>
+        <input type="range" id="energy_boost" min="1" max="5" value="3" oninput="updateValue('energy_boost')">
+        <small class="text-muted">Does it give you energy?</small>
+      </div>
+
+      <div>
+        <label style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
+          <span>Taste</span>
+          <span id="taste-value">3</span>
+        </label>
+        <input type="range" id="taste" min="1" max="5" value="3" oninput="updateValue('taste')">
+        <small class="text-muted">How good does it taste?</small>
+      </div>
+
+      <div>
+        <label style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-weight: 600;">
+          <span>Value</span>
+          <span id="value-value">3</span>
+        </label>
+        <input type="range" id="value" min="1" max="5" value="3" oninput="updateValue('value')">
+        <small class="text-muted">Is it worth the price?</small>
+      </div>
+    </div>
+
+    <h3 style="color: var(--green); margin-bottom: 1rem;">Step 3: Add Details</h3>
+
+    <div style="display: grid; gap: 1rem; margin-bottom: 2rem;">
+      <div>
+        <label for="notes" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Notes (Optional)</label>
+        <textarea id="notes" placeholder="Share your thoughts..." class="input-field" style="height: 100px; resize: vertical;"></textarea>
+      </div>
+
+      <div>
+        <label for="photo" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Photo (Optional)</label>
+        <input type="file" id="photo" accept="image/*" class="input-field">
+        <small class="text-muted">Upload a photo of the drink</small>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="submitReviewForm()" style="width: 100%; padding: 1rem;">
+      Submit Review
+    </button>
+
+    <p id="submit-error" class="error-text" style="margin-top: 1rem;"></p>
+  </div>
+</div>
+
+<script>
+  let selectedDrinkId = null;
+  let drinksData = [];
+
+  function updateValue(field) {
+    document.getElementById(field + "-value").textContent = document.getElementById(field).value;
+  }
+
+  async function loadDrinksForSelect() {
+    try {
+      const { query, collection, where, orderBy, getDocs } = await import("https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js");
+
+      const q = query(
+        collection(window.db, "drinks"),
+        where("approved", "==", true),
+        orderBy("name")
+      );
+
+      const snapshot = await getDocs(q);
+      drinksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      renderDrinkList();
+    } catch (error) {
+      console.error("Error loading drinks:", error);
+    }
+  }
+
+  function renderDrinkList(filter = "") {
+    const list = document.getElementById("drink-list");
+    const filtered = drinksData.filter(d => d.name.toLowerCase().includes(filter.toLowerCase()));
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<p class="text-muted" style="padding: 1rem;">No drinks found</p>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(drink => `
+      <div onclick="selectDrink('${drink.id}', '${drink.name.replace(/'/g, "\\'")}');" style="padding: 0.75rem 1rem; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.2s;">
+        <strong>${drink.name}</strong>
+        ${drink.review_count > 0 ? `<div style="font-size: 0.85rem; color: var(--green);">${drink.avg_overall?.toFixed(1) || 0}/5 (${drink.review_count} reviews)</div>` : ""}
+      </div>
+    `).join("");
+  }
+
+  function selectDrink(id, name) {
+    selectedDrinkId = id;
+    document.getElementById("selected-drink").style.display = "block";
+    document.getElementById("selected-drink-name").textContent = name;
+    document.getElementById("drink-search").value = "";
+    document.getElementById("drink-list").innerHTML = "";
+    document.getElementById("new-drink-name").value = "";
+  }
+
+  async function addNewDrink() {
+    const name = document.getElementById("new-drink-name").value.trim();
+    if (!name) {
+      document.getElementById("submit-error").textContent = "Please enter a drink name";
+      return;
+    }
+
+    try {
+      const drink = await window.createDrink(name);
+      if (drink) {
+        selectDrink(drink.id, drink.name);
+        document.getElementById("submit-error").textContent = "";
+      }
+    } catch (error) {
+      document.getElementById("submit-error").textContent = "Error creating drink: " + error.message;
+    }
+  }
+
+  async function submitReviewForm() {
+    document.getElementById("submit-error").textContent = "";
+
+    if (!selectedDrinkId) {
+      document.getElementById("submit-error").textContent = "Please select or create a drink";
+      return;
+    }
+
+    const metrics = {
+      drinkability: parseInt(document.getElementById("drinkability").value),
+      time_to_empty: parseInt(document.getElementById("time_to_empty").value),
+      energy_boost: parseInt(document.getElementById("energy_boost").value),
+      taste: parseInt(document.getElementById("taste").value),
+      value: parseInt(document.getElementById("value").value)
+    };
+
+    const notes = document.getElementById("notes").value.trim();
+    const photoFile = document.getElementById("photo").files[0];
+    const drinkName = document.getElementById("selected-drink-name").textContent;
+
+    try {
+      let imageUrl = null;
+      if (photoFile) {
+        const btn = event.target;
+        btn.disabled = true;
+        btn.textContent = "Uploading...";
+
+        imageUrl = await window.uploadDrinkImage(photoFile);
+
+        btn.disabled = false;
+        btn.textContent = "Submitting...";
+      }
+
+      const success = await window.submitReview(selectedDrinkId, drinkName, metrics, notes, imageUrl);
+      if (success) {
+        alert("Review submitted! Thanks for rating.");
+        window.location.href = `/drink/?id=${selectedDrinkId}`;
+      }
+    } catch (error) {
+      event.target.disabled = false;
+      event.target.textContent = "Submit Review";
+      document.getElementById("submit-error").textContent = "Error: " + error.message;
+    }
+  }
+
+  // Check auth and load drinks
+  const checkAuth = setInterval(() => {
+    if (window.currentUser === undefined) return;
+
+    clearInterval(checkAuth);
+
+    if (!window.currentUser) {
+      document.getElementById("auth-check").innerHTML = `
+        <p class="text-muted">Please sign in to submit a review</p>
+        <button class="btn btn-primary" onclick="openAuthModal()">Sign In</button>
+      `;
+    } else {
+      document.getElementById("auth-check").style.display = "none";
+      document.getElementById("submit-form").style.display = "block";
+      loadDrinksForSelect();
+
+      document.getElementById("drink-search").addEventListener("input", (e) => {
+        renderDrinkList(e.target.value);
+      });
+    }
+  }, 100);
+
+  window.updateValue = updateValue;
+  window.selectDrink = selectDrink;
+  window.addNewDrink = addNewDrink;
+  window.submitReviewForm = submitReviewForm;
+</script>
+{{ end }}
